@@ -8,7 +8,7 @@ import {
 } from "@stellar/stellar-sdk";
 import {
   computeStealthAddressAndViewTag,
-  formatSol,
+  formatXlm,
   hexToBytes,
 } from "../lib/stealth";
 import { getNetworkPassphrase, getNetwork } from "../lib/chain";
