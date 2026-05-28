@@ -102,22 +102,45 @@ function assertProductionAddresses(
   }
 }
 
-const network = getNetwork();
+/** Placeholder; deploy contracts and set VITE_STEALTH_REGISTRY_CONTRACT etc. */
+export const PLACEHOLDER_CONTRACT_ID =
+  "CDIYLW3OMCUHP37AMDZFMIB3GCY66MFICSCU3WYMB66L6XQM5CKQQO3S";
 
-const contractAddresses: Record<ContractKey, string> = {
-  stealthRegistry: contractId(network, "stealthRegistry"),
-  stealthAnnouncer: contractId(network, "stealthAnnouncer"),
-  groth16Verifier: contractId(network, "groth16Verifier"),
-  reputationVerifier: contractId(network, "reputationVerifier"),
-  schemaRegistry: contractId(network, "schemaRegistry"),
-  attestationEngineV2: contractId(network, "attestationEngineV2"),
-};
-
-assertProductionAddresses(network, contractAddresses);
+export const CONTRACT_ENV_KEYS = [
+  "VITE_STEALTH_REGISTRY_CONTRACT",
+  "VITE_STEALTH_ANNOUNCER_CONTRACT",
+  "VITE_GROTH16_VERIFIER_CONTRACT",
+  "VITE_REPUTATION_VERIFIER_CONTRACT",
+  "VITE_SCHEMA_REGISTRY_CONTRACT",
+  "VITE_ATTESTATION_ENGINE_CONTRACT",
+] as const;
 
 export const deployedAddresses = {
-  network,
-  ...contractAddresses,
+  network: "testnet" as const,
+  stealthRegistry: contractId(
+    "VITE_STEALTH_REGISTRY_CONTRACT",
+    PLACEHOLDER_CONTRACT_ID,
+  ),
+  stealthAnnouncer: contractId(
+    "VITE_STEALTH_ANNOUNCER_CONTRACT",
+    PLACEHOLDER_CONTRACT_ID,
+  ),
+  groth16Verifier: contractId(
+    "VITE_GROTH16_VERIFIER_CONTRACT",
+    PLACEHOLDER_CONTRACT_ID,
+  ),
+  reputationVerifier: contractId(
+    "VITE_REPUTATION_VERIFIER_CONTRACT",
+    PLACEHOLDER_CONTRACT_ID,
+  ),
+  schemaRegistry: contractId(
+    "VITE_SCHEMA_REGISTRY_CONTRACT",
+    PLACEHOLDER_CONTRACT_ID,
+  ),
+  attestationEngineV2: contractId(
+    "VITE_ATTESTATION_ENGINE_CONTRACT",
+    PLACEHOLDER_CONTRACT_ID,
+  ),
 } as const;
 
 export type DeployedAddresses = typeof deployedAddresses;
