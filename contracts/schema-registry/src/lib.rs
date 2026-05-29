@@ -31,6 +31,15 @@ pub struct Schema {
     pub deprecated: bool,
 }
 
+#[contracttype]
+#[derive(Clone)]
+pub struct SchemaStatus {
+    pub revocable: bool,
+    pub deprecated: bool,
+    pub schema_expiry_ledger: u32,
+    pub active: bool,
+}
+
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u32)]
@@ -162,6 +171,16 @@ impl SchemaRegistry {
         env.storage()
             .persistent()
             .set(&delegate_key(&schema_id), &Vec::<Address>::new(&env));
+
+        let ids_key = schema_ids_key(&env);
+        let mut schema_ids: Vec<BytesN<32>> = env
+            .storage()
+            .persistent()
+            .get(&ids_key)
+            .unwrap_or_else(|| Vec::new(&env));
+        schema_ids.push_back(schema_id.clone());
+        env.storage().persistent().set(&ids_key, &schema_ids);
+
         env.events().publish(
             (Symbol::new(&env, "SchemaRegistered"), EVENT_VERSION),
             (schema_id, authority, name),
@@ -193,8 +212,12 @@ impl SchemaRegistry {
         if delegates.contains(delegate.clone()) {
             return Err(SchemaError::DelegateAlreadyExists);
         }
-        delegates.push_back(delegate);
+        delegates.push_back(delegate.clone());
         env.storage().persistent().set(&dkey, &delegates);
+        env.events().publish(
+            (Symbol::new(&env, "DelegateAdded"),),
+            (schema_id, authority, delegate),
+        );
         Ok(())
     }
 
@@ -216,7 +239,7 @@ impl SchemaRegistry {
             .persistent()
             .get(&dkey)
             .unwrap_or_else(|| Vec::new(&env));
-        let pos = delegates.first_index_of(delegate);
+        let pos = delegates.first_index_of(delegate.clone());
         let idx = pos.ok_or(SchemaError::DelegateNotFound)?;
         let mut updated = Vec::new(&env);
         for i in 0..delegates.len() {
@@ -225,6 +248,10 @@ impl SchemaRegistry {
             }
         }
         env.storage().persistent().set(&dkey, &updated);
+        env.events().publish(
+            (Symbol::new(&env, "DelegateRemoved"),),
+            (schema_id, authority, delegate),
+        );
         Ok(())
     }
 
