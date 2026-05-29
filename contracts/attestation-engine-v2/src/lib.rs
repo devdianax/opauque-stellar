@@ -12,6 +12,10 @@ use soroban_sdk::{
 #[contract]
 pub struct AttestationEngineV2;
 
+/// Current event schema version — increment when the event topic/data layout changes.
+/// Scanners should reject events with an unrecognised version rather than misparse them.
+const EVENT_VERSION: u32 = 1;
+
 #[contracttype]
 #[derive(Clone)]
 pub struct Attestation {
@@ -291,7 +295,7 @@ impl AttestationEngineV2 {
         };
         env.storage().persistent().set(&key, &attestation);
         env.events().publish(
-            (Symbol::new(&env, "AttestationCreated"),),
+            (Symbol::new(&env, "AttestationCreated"), EVENT_VERSION),
             (uid.clone(), schema_id, issuer, stealth_address_hash),
         );
         Ok(uid)
@@ -333,7 +337,7 @@ impl AttestationEngineV2 {
         attestation.revocation_ledger = env.ledger().sequence();
         env.storage().persistent().set(&key, &attestation);
         env.events().publish(
-            (Symbol::new(&env, "AttestationRevoked"),),
+            (Symbol::new(&env, "AttestationRevoked"), EVENT_VERSION),
             (uid, revoker),
         );
         Ok(())
