@@ -6,6 +6,7 @@ use wasm_bindgen::prelude::*;
 use js_sys;
 use k256::{ecdsa::SigningKey, PublicKey};
 use alloy_primitives::Address;
+use log::{info, warn};
 use std::str::FromStr;
 
 /// The only event schema version this scanner understands.
@@ -25,6 +26,7 @@ use scanner::{
 #[wasm_bindgen(start)]
 pub fn init() {
     console_error_panic_hook::set_once();
+    env_logger::init();
 }
 
 // =============================================================================
